@@ -422,6 +422,38 @@ body {
   text-align: center;
 }
 
+.markdown-body h4 {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--accent-primary);
+  margin-top: 40px;
+  margin-bottom: 16px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.markdown-body p {
+  margin-bottom: 20px;
+  color: var(--text-secondary);
+}
+
+.markdown-body ul, .markdown-body ol {
+  margin-bottom: 24px;
+  padding-left: 24px;
+}
+
+.markdown-body li {
+  margin-bottom: 10px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.markdown-body strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
 
 .btn-destructive {
   height: 44px;

@@ -208,20 +208,20 @@ Use the following Markdown structure:
 
 ### LEGAL ABSTRACT & CASE OVERVIEW
 
-**1. KEY PARTIES & IDENTIFICATION**
+#### 1. KEY PARTIES & IDENTIFICATION
 - (List primary entities, individuals, or governing bodies involved)
 - (Specify roles if clear)
 
-**2. CRITICAL DATES & DEADLINES**
+#### 2. CRITICAL DATES & DEADLINES
 - (List all effective dates, expiration dates, court dates, or filing deadlines)
 
-**3. JURISDICTION & GOVERNING LAW**
+#### 3. JURISDICTION & GOVERNING LAW
 - (Specify the applicable law or court of jurisdiction)
 
-**4. PRIMARY OBLIGATIONS & FINDINGS**
+#### 4. PRIMARY OBLIGATIONS & FINDINGS
 - (Summarize the core legal obligations, rulings, or factual findings)
 
-**5. RISK ASSESSMENT & ANOMALIES**
+#### 5. RISK ASSESSMENT & ANOMALIES
 - (Identify potential risks, unusual clauses, or missing critical information)
 
 ---
