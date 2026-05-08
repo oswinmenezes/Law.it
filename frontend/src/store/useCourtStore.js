@@ -4,8 +4,10 @@ const INITIAL_SESSION_DURATION = 300; // 5 minutes in seconds
 
 const useCourtStore = create((set, get) => ({
   // App state
-  currentPage: 'landing', // landing | setup | courtroom | scorecard
+  currentPage: 'landing', // landing | setup | courtroom | scorecard | leaderboard
   apiKey: localStorage.getItem('gemini_api_key') || '',
+  playerName: '',
+  playerId: null,
 
   // Case data
   caseData: null,
@@ -51,6 +53,9 @@ const useCourtStore = create((set, get) => ({
     localStorage.setItem('gemini_api_key', key);
     set({ apiKey: key });
   },
+
+  setPlayerName: (name) => set({ playerName: name }),
+  setPlayerId: (id) => set({ playerId: id }),
 
   setPage: (page) => set({ currentPage: page }),
 

@@ -4,6 +4,7 @@ import Landing from './components/Landing';
 import CaseSetup from './components/CaseSetup';
 import Courtroom from './components/Courtroom';
 import ScoreCard from './components/ScoreCard';
+import Leaderboard from './components/Leaderboard';
 
 export default function App() {
   const currentPage = useCourtStore((s) => s.currentPage);
@@ -15,6 +16,7 @@ export default function App() {
         {currentPage === 'setup'     && <CaseSetup key="setup"     />}
         {currentPage === 'courtroom' && <Courtroom key="courtroom" />}
         {currentPage === 'scorecard' && <ScoreCard key="scorecard" />}
+        {currentPage === 'leaderboard' && <Leaderboard key="leaderboard" />}
       </AnimatePresence>
     </div>
   );
