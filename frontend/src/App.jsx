@@ -9,10 +9,10 @@ export default function App() {
   const currentPage = useCourtStore((s) => s.currentPage);
 
   return (
-    <div className="h-full w-full overflow-hidden bg-court-black">
+    <div style={{ height: '100%', width: '100%', overflow: 'auto', background: 'var(--c-black)' }}>
       <AnimatePresence mode="wait">
-        {currentPage === 'landing' && <Landing key="landing" />}
-        {currentPage === 'setup' && <CaseSetup key="setup" />}
+        {currentPage === 'landing'   && <Landing   key="landing"   />}
+        {currentPage === 'setup'     && <CaseSetup key="setup"     />}
         {currentPage === 'courtroom' && <Courtroom key="courtroom" />}
         {currentPage === 'scorecard' && <ScoreCard key="scorecard" />}
       </AnimatePresence>

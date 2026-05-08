@@ -84,10 +84,10 @@ export default function ScoreCard() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <div className="max-w-3xl mx-auto px-6 py-10">
+      <div className="max-w-3xl mx-auto px-8 sm:px-10 py-12 sm:py-16">
         {/* Header */}
         <motion.div
-          className="text-center mb-10"
+          className="text-center mb-12"
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
         >
@@ -102,7 +102,7 @@ export default function ScoreCard() {
 
         {/* Overall Score */}
         <motion.div
-          className="glass-panel rounded-2xl p-8 mb-6 text-center"
+          className="glass-panel rounded-2xl p-10 mb-8 text-center"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2 }}
@@ -140,7 +140,7 @@ export default function ScoreCard() {
 
         {/* Criteria Scores */}
         <motion.div
-          className="glass-panel rounded-2xl p-6 mb-6 space-y-5"
+          className="glass-panel rounded-2xl p-8 mb-8 space-y-5"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -161,9 +161,9 @@ export default function ScoreCard() {
         </motion.div>
 
         {/* Strengths, Weaknesses, Improvements */}
-        <div className="grid md:grid-cols-3 gap-4 mb-6">
+        <div className="grid md:grid-cols-3 gap-5 mb-8">
           <motion.div
-            className="glass-panel rounded-xl p-5"
+            className="glass-panel rounded-xl p-6"
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.8 }}
@@ -182,7 +182,7 @@ export default function ScoreCard() {
           </motion.div>
 
           <motion.div
-            className="glass-panel rounded-xl p-5"
+            className="glass-panel rounded-xl p-6"
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.9 }}
@@ -201,7 +201,7 @@ export default function ScoreCard() {
           </motion.div>
 
           <motion.div
-            className="glass-panel rounded-xl p-5"
+            className="glass-panel rounded-xl p-6"
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 1.0 }}
@@ -223,7 +223,7 @@ export default function ScoreCard() {
         {/* Judicial Verdict */}
         {scores.judicial_verdict && (
           <motion.div
-            className="glass-panel rounded-xl p-6 mb-8 border-gold-400/20"
+            className="glass-panel rounded-xl p-7 mb-10 border-gold-400/20"
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 1.1 }}
@@ -237,7 +237,7 @@ export default function ScoreCard() {
 
         {/* Actions */}
         <motion.div
-          className="flex items-center justify-center gap-4 pb-10"
+          className="flex items-center justify-center gap-5 pb-12"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.3 }}

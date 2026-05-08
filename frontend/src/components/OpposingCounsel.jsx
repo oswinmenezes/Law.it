@@ -10,18 +10,18 @@ export default function OpposingCounsel() {
 
   return (
     <motion.div
-      className={`glass-panel rounded-2xl p-5 flex flex-col items-center gap-4 transition-all duration-500 ${
+      className={`glass-panel rounded-2xl p-6 flex flex-col items-center gap-4 transition-all duration-500 ${
         isActive ? 'border-blue-400/40 shadow-lg shadow-blue-400/10' : 'border-court-border'
       }`}
     >
       {/* Avatar */}
       <div className="relative">
-        <div className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-500 ${
+        <div className={`w-[5.5rem] h-[5.5rem] rounded-full flex items-center justify-center transition-all duration-500 ${
           isActive
             ? 'bg-gradient-to-br from-blue-500/30 to-blue-700/20 animate-glow-oppose'
             : 'bg-court-surface border border-court-border'
         }`}>
-          <Swords className={`w-9 h-9 transition-colors duration-300 ${isActive ? 'text-blue-400' : 'text-white/20'}`} />
+          <Swords className={`w-10 h-10 transition-colors duration-300 ${isActive ? 'text-blue-400' : 'text-white/20'}`} />
         </div>
         {isActive && (
           <motion.div

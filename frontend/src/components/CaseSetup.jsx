@@ -1,16 +1,24 @@
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, FileText, Scale, ArrowLeft, Loader2, ChevronRight, Gavel, AlertTriangle, Star } from 'lucide-react';
+import { Upload, Scale, ArrowLeft, Loader2, ChevronRight, Gavel, AlertTriangle } from 'lucide-react';
 import useCourtStore from '../store/useCourtStore';
 import { parseFile, extractCaseStructure } from '../lib/fileParser';
 import prebuiltCases from '../lib/prebuiltCases';
-import ParticleBackground from './ParticleBackground';
 import ApiKeyModal from './ApiKeyModal';
 
-const difficultyColors = {
-  Medium: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20',
-  Hard: 'text-orange-400 bg-orange-400/10 border-orange-400/20',
-  Expert: 'text-red-400 bg-red-400/10 border-red-400/20',
+function diffClass(d) {
+  if (d === 'Medium') return 'diff-medium';
+  if (d === 'Hard') return 'diff-hard';
+  return 'diff-expert';
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: 0.12 + i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+  }),
 };
 
 export default function CaseSetup() {
@@ -27,10 +35,8 @@ export default function CaseSetup() {
       setUploadError('Supported formats: PDF, DOCX, TXT');
       return;
     }
-
     setIsUploading(true);
     setUploadError('');
-
     try {
       const rawText = await parseFile(file);
       if (!rawText || rawText.length < 50) {
@@ -52,8 +58,7 @@ export default function CaseSetup() {
   const handleDrop = useCallback((e) => {
     e.preventDefault();
     setDragOver(false);
-    const file = e.dataTransfer.files[0];
-    handleFileUpload(file);
+    handleFileUpload(e.dataTransfer.files[0]);
   }, [handleFileUpload]);
 
   const selectPrebuilt = (caseItem) => {
@@ -62,125 +67,130 @@ export default function CaseSetup() {
   };
 
   const proceedToCourtroom = () => {
-    if (!apiKey) {
-      setShowApiModal(true);
-      return;
-    }
+    if (!apiKey) { setShowApiModal(true); return; }
     setPage('courtroom');
   };
 
   return (
     <motion.div
-      className="h-full w-full relative overflow-y-auto"
-      initial={{ opacity: 0, x: 50 }}
+      className="setup-root"
+      initial={{ opacity: 0, x: 40 }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -50 }}
-      transition={{ duration: 0.4 }}
+      exit={{ opacity: 0, x: -40 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
     >
-      <ParticleBackground />
-      <div className="absolute inset-0 bg-gradient-to-b from-court-black/90 via-court-black/70 to-court-black/90 z-[1]" />
+      <div className="setup-bg" />
 
-      <div className="relative z-10 max-w-4xl mx-auto px-6 py-10">
+      <div className="setup-content">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-10">
+        <motion.div
+          className="setup-header"
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <button
+            className="setup-back-btn"
             onClick={() => setPage('landing')}
-            className="w-10 h-10 rounded-xl bg-court-panel border border-court-border hover:border-gold-400/30 flex items-center justify-center transition-all cursor-pointer"
+            title="Back"
           >
-            <ArrowLeft className="w-4 h-4 text-white/60" />
+            <ArrowLeft size={20} strokeWidth={2} />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-white font-[family-name:var(--font-display)]">
-              Prepare Your <span className="gold-gradient-text">Case</span>
+            <h1 className="setup-title">
+              Prepare Your{' '}
+              <span className="gold-gradient-text">Case</span>
             </h1>
-            <p className="text-sm text-white/40 mt-1">Upload a case file or select a prebuilt scenario</p>
-          </div>
-        </div>
-
-        {/* Upload Zone */}
-        <motion.div
-          className={`glass-panel rounded-2xl p-8 mb-8 border-2 border-dashed transition-all duration-300 cursor-pointer ${
-            dragOver ? 'border-gold-400/60 bg-gold-400/5' : 'border-court-border hover:border-gold-400/30'
-          }`}
-          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={handleDrop}
-          onClick={() => {
-            if (!isUploading) document.getElementById('file-input').click();
-          }}
-          whileHover={{ y: -2 }}
-        >
-          <input
-            id="file-input"
-            type="file"
-            accept=".pdf,.docx,.txt"
-            className="hidden"
-            onChange={(e) => handleFileUpload(e.target.files[0])}
-          />
-
-          <div className="text-center">
-            {isUploading ? (
-              <Loader2 className="w-10 h-10 text-gold-400 mx-auto mb-3 animate-spin" />
-            ) : (
-              <Upload className="w-10 h-10 text-gold-400/60 mx-auto mb-3" />
-            )}
-            <h3 className="text-lg font-semibold text-white/80 mb-1">
-              {isUploading ? 'Parsing case file...' : 'Upload Case Document'}
-            </h3>
-            <p className="text-sm text-white/30">
-              Drag & drop or click to upload — PDF, DOCX, or TXT
-            </p>
-            {uploadError && (
-              <div className="mt-3 flex items-center justify-center gap-2 text-red-400 text-sm">
-                <AlertTriangle className="w-4 h-4" />
-                {uploadError}
-              </div>
-            )}
+            <p className="setup-subtitle">Upload a case file or select a prebuilt scenario</p>
           </div>
         </motion.div>
 
+        {/* Upload Zone */}
+        <motion.div
+          className={`upload-zone${dragOver ? ' dragover' : ''}`}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleDrop}
+          onClick={() => { if (!isUploading) document.getElementById('case-file-input').click(); }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.5 }}
+        >
+          <input
+            id="case-file-input"
+            type="file"
+            accept=".pdf,.docx,.txt"
+            style={{ display: 'none' }}
+            onChange={(e) => handleFileUpload(e.target.files[0])}
+          />
+
+          {isUploading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+              <Loader2 size={48} color="var(--gold-400)" className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
+              <p className="upload-title">Parsing case file…</p>
+            </div>
+          ) : (
+            <>
+              <div className="upload-icon-wrap">
+                <Upload size={30} color="var(--gold-400)" strokeWidth={1.8} />
+              </div>
+              <p className="upload-title">Upload Case Document</p>
+              <p className="upload-hint">Drag & drop or click to upload — PDF, DOCX, or TXT</p>
+            </>
+          )}
+
+          {uploadError && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, color: '#f87171', fontSize: '0.85rem', marginTop: 18 }}>
+              <AlertTriangle size={15} />
+              {uploadError}
+            </div>
+          )}
+        </motion.div>
+
         {/* Divider */}
-        <div className="flex items-center gap-4 mb-8">
-          <div className="flex-1 h-px bg-court-border" />
-          <span className="text-xs text-white/30 uppercase tracking-widest">or select a scenario</span>
-          <div className="flex-1 h-px bg-court-border" />
-        </div>
+        <motion.div
+          className="divider-or"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <div className="divider-line" />
+          <span className="divider-text">or select a scenario</span>
+          <div className="divider-line" />
+        </motion.div>
 
         {/* Prebuilt Cases */}
-        <div className="grid gap-4">
+        <div className="case-cards-list">
           {prebuiltCases.map((c, i) => (
             <motion.div
               key={c.id}
-              className="glass-panel rounded-xl p-6 hover:border-gold-400/30 transition-all group cursor-pointer"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.1 * i }}
-              whileHover={{ y: -2 }}
+              className="case-card"
+              custom={i}
+              variants={itemVariants}
+              initial="hidden"
+              animate="visible"
+              whileHover={{ y: -3 }}
               onClick={() => selectPrebuilt(c)}
             >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Gavel className="w-5 h-5 text-gold-400/70" />
-                    <h3 className="text-base font-semibold text-white/90 group-hover:text-gold-300 transition-colors">
-                      {c.case_title}
-                    </h3>
-                  </div>
-                  <p className="text-sm text-white/40 mb-3 ml-8">{c.description}</p>
-                  <div className="flex items-center gap-3 ml-8">
-                    <span className="text-xs text-white/30 flex items-center gap-1">
-                      <Scale className="w-3 h-3" />
-                      {c.court_type}
-                    </span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full border ${difficultyColors[c.difficulty]}`}>
-                      {c.difficulty}
-                    </span>
-                    <span className="text-xs text-white/20">
-                      {c.legal_issues.length} issues
-                    </span>
-                  </div>
+              <div className="case-card-gavel">
+                <Gavel size={18} color="var(--gold-400)" strokeWidth={1.8} />
+              </div>
+              <div className="case-card-body">
+                <div className="case-card-title">{c.case_title}</div>
+                <div className="case-card-desc">{c.description}</div>
+                <div className="case-card-meta">
+                  <span className="case-card-court">
+                    <Scale size={13} strokeWidth={1.8} />
+                    {c.court_type}
+                  </span>
+                  <span className={`case-card-difficulty ${diffClass(c.difficulty)}`}>
+                    {c.difficulty}
+                  </span>
+                  <span className="case-card-issues">{c.legal_issues.length} issues</span>
                 </div>
-                <ChevronRight className="w-5 h-5 text-white/20 group-hover:text-gold-400 group-hover:translate-x-1 transition-all mt-1" />
+              </div>
+              <div className="case-card-arrow">
+                <ChevronRight size={16} strokeWidth={2} />
               </div>
             </motion.div>
           ))}
@@ -198,4 +208,12 @@ export default function CaseSetup() {
       )}
     </motion.div>
   );
+}
+
+/* spinner keyframe via style tag trick */
+if (!document.getElementById('__spin_kf')) {
+  const s = document.createElement('style');
+  s.id = '__spin_kf';
+  s.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+  document.head.appendChild(s);
 }

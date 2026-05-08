@@ -11,18 +11,18 @@ export default function LawyerPodium() {
 
   return (
     <motion.div
-      className={`glass-panel rounded-2xl p-5 flex flex-col items-center gap-4 transition-all duration-500 ${
+      className={`glass-panel rounded-2xl p-6 flex flex-col items-center gap-4 transition-all duration-500 ${
         isActive ? 'border-emerald-400/40 shadow-lg shadow-emerald-400/10' : 'border-court-border'
       }`}
     >
       {/* Avatar */}
       <div className="relative">
-        <div className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-500 ${
+        <div className={`w-[5.5rem] h-[5.5rem] rounded-full flex items-center justify-center transition-all duration-500 ${
           isActive
             ? 'bg-gradient-to-br from-emerald-500/30 to-emerald-700/20 animate-glow-lawyer'
             : 'bg-court-surface border border-court-border'
         }`}>
-          <User className={`w-9 h-9 transition-colors duration-300 ${isActive ? 'text-emerald-400' : 'text-white/20'}`} />
+          <User className={`w-10 h-10 transition-colors duration-300 ${isActive ? 'text-emerald-400' : 'text-white/20'}`} />
         </div>
         {/* Mic indicator */}
         <div className={`absolute -bottom-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center border-2 border-court-dark ${

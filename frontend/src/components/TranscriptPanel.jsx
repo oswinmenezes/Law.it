@@ -23,7 +23,7 @@ export default function TranscriptPanel() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-court-border">
+      <div className="flex items-center gap-2.5 px-5 py-4 border-b border-court-border/60">
         <MessageSquare className="w-4 h-4 text-gold-400/60" />
         <span className="text-xs font-semibold text-white/50 uppercase tracking-wider">Live Transcript</span>
         <span className="ml-auto text-[10px] text-white/20 font-[family-name:var(--font-mono)]">
@@ -34,7 +34,7 @@ export default function TranscriptPanel() {
       {/* Transcript body */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-4 py-3 space-y-3"
+        className="flex-1 overflow-y-auto px-5 py-4 space-y-4"
         style={{ scrollBehavior: 'smooth' }}
       >
         {transcript.length === 0 && (

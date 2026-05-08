@@ -422,7 +422,7 @@ export default function Courtroom() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
-        <div className="glass-panel rounded-2xl p-8 max-w-md text-center">
+        <div className="glass-panel rounded-2xl p-10 max-w-md text-center">
           <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-white mb-2">Session Error</h2>
           <p className="text-sm text-white/50 mb-6">{error}</p>
@@ -472,7 +472,7 @@ export default function Courtroom() {
       exit={{ opacity: 0 }}
     >
       {/* Top Bar */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-court-border bg-court-dark/80 backdrop-blur-sm">
+      <div className="flex items-center justify-between px-8 py-4 border-b border-court-border/60 bg-court-dark/90 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <Scale className="w-5 h-5 text-gold-400/60" />
           <div>
@@ -504,7 +504,7 @@ export default function Courtroom() {
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Courtroom Arena */}
-        <div className="flex-1 flex flex-col p-6 gap-6">
+        <div className="flex-1 flex flex-col p-8 gap-8">
           {/* Judge (top center) */}
           <div className="flex justify-center">
             <div className="w-full max-w-xs">
@@ -523,7 +523,7 @@ export default function Courtroom() {
           </div>
 
           {/* Controls */}
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-5">
             {/* Mic Toggle */}
             <motion.button
               id="btn-toggle-mic"
@@ -554,7 +554,7 @@ export default function Courtroom() {
         </div>
 
         {/* Transcript Sidebar */}
-        <div className="w-80 lg:w-96 border-l border-court-border bg-transcript-bg flex flex-col">
+        <div className="w-80 lg:w-[26rem] border-l border-court-border/60 bg-transcript-bg flex flex-col">
           <TranscriptPanel />
         </div>
       </div>
