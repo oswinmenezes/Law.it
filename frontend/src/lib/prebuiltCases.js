@@ -1,5 +1,6 @@
 /**
  * Prebuilt Indian Legal Cases for Quick Start
+ * Includes: Writ, Bail, Constitutional, Medical Negligence, Family Law, and IP.
  */
 
 const prebuiltCases = [
@@ -57,13 +58,7 @@ Municipal Corporation of Greater Mumbai through its Commissioner ... Respondent
 
 PETITION UNDER ARTICLE 226 OF THE CONSTITUTION OF INDIA
 
-The Petitioner submits that he is the owner of a commercial establishment situated at Shop No. 12, Ground Floor, Paradise Complex, S.V. Road, Andheri West, Mumbai 400058, operating a general merchandise business for the past 15 years. The Petitioner holds Trade License No. BMC/AW/2024/1847 valid till March 2026 and has regularly paid all municipal taxes.
-
-On 12.03.2025, officers of the Respondent Corporation demolished the said shop alleging unauthorized construction under Section 354A of the Mumbai Municipal Corporation Act. However, no show-cause notice, demolition notice, or any prior intimation was given to the Petitioner. The action was carried out in gross violation of principles of natural justice.
-
-It is pertinent to note that similar commercial establishments in the same complex have not been subjected to any such action, making the impugned action discriminatory under Article 14.
-
-The Petitioner submits that the right to carry on trade or business is a fundamental right under Article 19(1)(g) and the right to livelihood is protected under Article 21 of the Constitution. The arbitrary demolition without due process violates these fundamental rights.`,
+The Petitioner submits that he is the owner of a commercial establishment situated at Shop No. 12, Ground Floor, Paradise Complex, S.V. Road, Andheri West, Mumbai 400058...`,
     judge_personality: {
       temperament: 'stern',
       questioning_style: 'aggressive',
@@ -124,13 +119,7 @@ IN THE HIGH COURT OF DELHI AT NEW DELHI
 
 Anil Sharma ... Applicant/Accused
 Vs.
-Central Bureau of Investigation ... Respondent
-
-APPLICATION UNDER SECTION 439 CR.P.C.
-
-The applicant is a former Director of National Infrastructure Ltd., a Government of India undertaking. The CBI has registered FIR No. RC/2025/001 alleging that the applicant conspired with private contractors to award procurement contracts at inflated rates causing an alleged loss of Rs. 120 crores.
-
-The applicant has been in custody for over 3 months. The investigation is complete and chargesheet has been filed. The trial is likely to take considerable time given the complexity and volume of documents involved. Two co-accused who held similar positions have been granted bail. The applicant is 62 years old with serious cardiac conditions. He is not a flight risk having deep roots in the community and having cooperated throughout the investigation.`,
+Central Bureau of Investigation ... Respondent...`,
     judge_personality: {
       temperament: 'balanced',
       questioning_style: 'probing',
@@ -184,16 +173,7 @@ The applicant has been in custody for over 3 months. The investigation is comple
       respondent: 'Union of India through Secretary, Ministry of Home Affairs',
     },
     raw_text: `WRIT PETITION (CIVIL) NO. _____ OF 2024
-IN THE SUPREME COURT OF INDIA
-CIVIL ORIGINAL JURISDICTION
-
-Citizens for Digital Rights ... Petitioner
-Vs.
-Union of India through Secretary, Ministry of Home Affairs ... Respondent
-
-PETITION UNDER ARTICLE 32 OF THE CONSTITUTION OF INDIA
-
-The Petitioner challenges the constitutional validity of Sections 12 and 15 of the Digital Security Act, 2024 as being violative of Articles 14, 19(1)(a), and 21 of the Constitution. Section 12 authorizes mass surveillance without judicial oversight, while Section 15 mandates private entities to facilitate such surveillance. The provisions fail the proportionality test laid down in K.S. Puttaswamy v. Union of India (2017) 10 SCC 1.`,
+IN THE SUPREME COURT OF INDIA...`,
     judge_personality: {
       temperament: 'intellectual',
       questioning_style: 'socratic',
@@ -205,6 +185,163 @@ The Petitioner challenges the constitutional validity of Sections 12 and 15 of t
       aggression: 'moderate',
     },
   },
+  {
+    id: 'medical-negligence',
+    case_title: 'Sunita Devi v. LifeCare Super Specialty Hospital',
+    court_type: 'State Consumer Commission',
+    description: 'Consumer dispute alleging medical negligence leading to permanent disability after a routine gall bladder surgery.',
+    difficulty: 'Medium',
+    legal_issues: [
+      'Definition of Deficiency in Service',
+      'Res Ipsa Loquitur in Medical Negligence',
+      'Bolam Test vs. Bolitho Test',
+      'Quantum of Compensation',
+      'Liability of Hospital for Consultant Doctors',
+    ],
+    facts: [
+      'The Complainant was admitted for a routine laparoscopic cholecystectomy.',
+      'Post-surgery, she complained of severe abdominal pain and bile leakage.',
+      'It was later discovered that the surgeon inadvertently clipped the Common Bile Duct (CBD).',
+      'The hospital failed to perform an ERCP immediately, leading to jaundice and sepsis.',
+      'The Complainant had to undergo major reconstructive surgery at another hospital.',
+      'Hospital bills totaled Rs. 15 lakhs for a procedure estimated at Rs. 50,000.',
+    ],
+    timeline: [
+      '10.01.2025 — Initial surgery performed',
+      '12.01.2025 — Complications started, jaundice observed',
+      '15.01.2025 — Patient shifted to another hospital in critical state',
+      '20.02.2025 — Complaint filed before Consumer Commission',
+    ],
+    procedural_history: [
+      'Hospital denied negligence in their written version',
+      'Medical board opinion sought by the Commission',
+    ],
+    relief_sought: [
+      'Compensation of Rs. 1 Crore for physical agony and loss of income',
+      'Refund of all hospital expenses with 12% interest',
+      'Action against the operating surgeon for professional misconduct',
+    ],
+    parties: {
+      petitioner: 'Sunita Devi (Complainant)',
+      respondent: 'LifeCare Hospital & Dr. Sameer (Opposite Parties)',
+    },
+    raw_text: `BEFORE THE STATE CONSUMER DISPUTES REDRESSAL COMMISSION...
+    The Complainant, a 45-year-old school teacher, alleges gross medical negligence by the Opposite Parties. During a routine surgery, the operating surgeon failed to identify the anatomical structures correctly, leading to a permanent impairment of the digestive system. The hospital's lack of post-operative care constitutes a clear deficiency in service under the Consumer Protection Act, 2019.`,
+    judge_personality: {
+      temperament: 'empathetic',
+      questioning_style: 'fact-oriented',
+      patience_level: 'high',
+    },
+    opposing_strategy: {
+      primary_attack: 'Surgical complication is an inherent risk, not negligence',
+      style: 'technical',
+      aggression: 'moderate',
+    },
+  },
+  {
+    id: 'section-498a-quashing',
+    case_title: 'Vikram Mehta v. State of Haryana',
+    court_type: 'Punjab & Haryana High Court',
+    description: 'Petition under Section 482 CrPC for quashing of FIR registered under Section 498A IPC (Cruelty) alleging misuse of law.',
+    difficulty: 'Hard',
+    legal_issues: [
+      'Quashing under Section 482 CrPC',
+      'Abuse of Process of Court',
+      'Vague and General Allegations',
+      'Territorial Jurisdiction',
+      'Mediation and Settlement Possibilities',
+    ],
+    facts: [
+      'The marriage between the Petitioner and the Complainant took place in 2022.',
+      'The Complainant left the matrimonial home within 6 months after a dispute regarding living in a joint family.',
+      'FIR was registered in her parental hometown, which is 500km away from the matrimonial home.',
+      'The FIR names the husband, his 80-year-old grandmother, and a sister living in the USA.',
+      'No specific dates or instances of cruelty are mentioned in the complaint.',
+      'Medical records show no signs of physical injury.',
+    ],
+    timeline: [
+      '15.05.2022 — Marriage solemnized',
+      '10.12.2022 — Separation',
+      '05.02.2025 — FIR registered under Section 498A/406 IPC',
+      '20.03.2025 — Quashing petition filed',
+    ],
+    procedural_history: [
+      'Anticipatory bail granted to the Petitioners',
+      'Notice issued to the Complainant wife',
+    ],
+    relief_sought: [
+      'Quashing of FIR No. 45/2025 and all subsequent proceedings',
+      'Stay on investigation pending the disposal of the petition',
+    ],
+    parties: {
+      petitioner: 'Vikram Mehta and others (Husband\'s family)',
+      respondent: 'State of Haryana and Priya Mehta (Wife)',
+    },
+    raw_text: `IN THE HIGH COURT OF PUNJAB AND HARYANA AT CHANDIGARH...
+    This is a classic case of legal extortion where the entire family of the husband has been impleaded in a matrimonial dispute. The allegations are "omnibus" in nature without any specific overtones. As per the Preeti Gupta v. State of Jharkhand judgment, such proceedings are liable to be quashed to prevent the miscarriage of justice.`,
+    judge_personality: {
+      temperament: 'cynical',
+      questioning_style: 'direct',
+      patience_level: 'low',
+    },
+    opposing_strategy: {
+      primary_attack: 'Allegations require trial; cannot be quashed at threshold',
+      style: 'emotional',
+      aggression: 'high',
+    },
+  },
+  {
+    id: 'trademark-infringement',
+    case_title: 'Z-Tech Corp v. Zee-Technologies Pvt Ltd',
+    court_type: 'Delhi High Court (IP Division)',
+    description: 'Intellectual Property suit seeking permanent injunction for trademark infringement and passing off.',
+    difficulty: 'Expert',
+    legal_issues: [
+      'Deceptive Similarity',
+      'Prior User Rights',
+      'Well-known Trademark Status',
+      'Balance of Convenience',
+      'Triple Identity Test',
+    ],
+    facts: [
+      'The Plaintiff (Z-Tech) is a global leader in software solutions since 1995.',
+      'The Defendant started using the name "Zee-Technologies" in 2024 for identical software products.',
+      'The logos use the same color scheme (Blue and Silver) and a similar font.',
+      'Evidence shows customers tagging the wrong company on social media (actual confusion).',
+      'The Defendant claims "Zee" is a generic prefix derived from the founder\'s name.',
+    ],
+    timeline: [
+      '1995 — Plaintiff registers trademark in India',
+      '2024 — Defendant launches products with infringing mark',
+      'Jan 2025 — Cease and Desist notice sent',
+      'Mar 2025 — Suit filed in Delhi High Court',
+    ],
+    procedural_history: [
+      'Ex-parte ad-interim injunction granted initially',
+      'Application under Order 39 Rule 4 filed by Defendant to vacate stay',
+    ],
+    relief_sought: [
+      'Permanent injunction restraining use of the mark "Zee"',
+      'Damages of Rs. 50 lakhs for loss of reputation',
+      'Rendition of accounts of profits made by the Defendant',
+    ],
+    parties: {
+      petitioner: 'Z-Tech Corporation (Plaintiff)',
+      respondent: 'Zee-Technologies Pvt Ltd (Defendant)',
+    },
+    raw_text: `IN THE HIGH COURT OF DELHI: NEW DELHI (COMMERCIAL DIVISION)...
+    The Defendant has adopted a phonetically and visually similar mark to ride upon the goodwill of the Plaintiff. The products are sold through the same trade channels to the same class of consumers. This is a clear case of "dishonest adoption" intended to cause confusion in the marketplace.`,
+    judge_personality: {
+      temperament: 'scholarly',
+      questioning_style: 'analytical',
+      patience_level: 'moderate',
+    },
+    opposing_strategy: {
+      primary_attack: 'The mark is descriptive and common to the trade',
+      style: 'legalistic',
+      aggression: 'moderate',
+    },
+  }
 ];
 
 export default prebuiltCases;

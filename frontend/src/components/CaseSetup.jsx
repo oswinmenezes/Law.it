@@ -1,10 +1,11 @@
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, Scale, ArrowLeft, Loader2, ChevronRight, Gavel, AlertTriangle } from 'lucide-react';
+import { Upload, Scale, ArrowLeft, Loader2, ChevronRight, Gavel, AlertTriangle, Eye } from 'lucide-react';
 import useCourtStore from '../store/useCourtStore';
 import { parseFile, extractCaseStructure } from '../lib/fileParser';
 import prebuiltCases from '../lib/prebuiltCases';
 import ApiKeyModal from './ApiKeyModal';
+import CasePreviewModal from './CasePreviewModal';
 
 function diffClass(d) {
   if (d === 'Medium') return 'diff-medium';
@@ -27,6 +28,7 @@ export default function CaseSetup() {
   const [uploadError, setUploadError] = useState('');
   const [dragOver, setDragOver] = useState(false);
   const [showApiModal, setShowApiModal] = useState(false);
+  const [previewCase, setPreviewCase] = useState(null);
 
   const handleFileUpload = useCallback(async (file) => {
     if (!file) return;
@@ -170,7 +172,7 @@ export default function CaseSetup() {
               initial="hidden"
               animate="visible"
               whileHover={{ y: -3 }}
-              onClick={() => selectPrebuilt(c)}
+              onClick={() => setPreviewCase(c)}
             >
               <div className="case-card-gavel">
                 <Gavel size={18} color="var(--gold-400)" strokeWidth={1.8} />
@@ -189,8 +191,9 @@ export default function CaseSetup() {
                   <span className="case-card-issues">{c.legal_issues.length} issues</span>
                 </div>
               </div>
-              <div className="case-card-arrow">
-                <ChevronRight size={16} strokeWidth={2} />
+              <div className="case-card-arrow" style={{ padding: '0 12px', width: 'auto', gap: 6, fontWeight: 500, fontSize: '0.85rem' }}>
+                <Eye size={16} strokeWidth={2} />
+                Preview
               </div>
             </motion.div>
           ))}
@@ -206,6 +209,15 @@ export default function CaseSetup() {
           }}
         />
       )}
+
+      <CasePreviewModal
+        caseData={previewCase}
+        onClose={() => setPreviewCase(null)}
+        onSelect={(c) => {
+          setPreviewCase(null);
+          selectPrebuilt(c);
+        }}
+      />
     </motion.div>
   );
 }

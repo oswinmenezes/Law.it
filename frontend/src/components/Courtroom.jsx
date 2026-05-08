@@ -341,25 +341,42 @@ export default function Courtroom() {
         promptLength: scoringPrompt.length,
       });
 
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: scoringPrompt }] }],
-            generationConfig: {
-              temperature: 0.3,
-              responseMimeType: 'application/json',
-            },
-          }),
+      let response;
+      let responseOk = false;
+      const modelsToTry = ['gemini-2.5-flash', 'gemini-1.5-pro', 'gemini-1.5-flash'];
+      
+      for (const model of modelsToTry) {
+        try {
+          console.log(`[Scoring] Attempting evaluation with ${model}...`);
+          response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: scoringPrompt }] }],
+                generationConfig: {
+                  temperature: 0.3,
+                  responseMimeType: 'application/json',
+                },
+              }),
+            }
+          );
+          
+          if (response.ok) {
+            responseOk = true;
+            break;
+          } else {
+            const errBody = await response.text();
+            console.warn(`[Scoring] ${model} failed with ${response.status}:`, errBody);
+          }
+        } catch (e) {
+          console.warn(`[Scoring] Network error with ${model}:`, e.message);
         }
-      );
+      }
 
-      if (!response.ok) {
-        const errBody = await response.text();
-        console.error('[Scoring] API error:', response.status, errBody);
-        throw new Error(`Scoring API returned ${response.status}`);
+      if (!responseOk) {
+        throw new Error(`All scoring API attempts failed. Please try again later.`);
       }
 
       const data = await response.json();
