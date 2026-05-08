@@ -67,7 +67,10 @@ function resizeImage(dataUrl, maxWidth, maxHeight, quality = 0.8) {
 }
 
 export default function App() {
-  const [apiKey] = useState(import.meta.env.VITE_OPENROUTER_API_KEY || '');
+  const [apiKeys] = useState(() => {
+    const keys = import.meta.env.VITE_OPENROUTER_API_KEYS || import.meta.env.VITE_OPENROUTER_API_KEY || '';
+    return keys.split(',').map(k => k.trim()).filter(Boolean);
+  });
   
   // Workspace state
   const [history, setHistory] = useState(loadHistory());
@@ -104,7 +107,7 @@ export default function App() {
     setHistory(prev => [newDoc, ...prev]);
     setActiveDocId(newDocId);
     saveHistory([newDoc, ...history]);
-  }, [apiKey, history, addToast]);
+  }, [history, addToast]);
 
   const handleScan = useCallback(async () => {
     if (!activeDoc || activeDoc.status !== 'pending') return;
@@ -119,20 +122,29 @@ export default function App() {
       for (let i = 0; i < pagesToProcess.length; i++) {
         setProcessingPage(i + 1);
         const optimized = await resizeImage(pagesToProcess[i], 2048, 2048, 0.8);
-        const result = await performOCR(apiKey, optimized.split(',')[1], 'image/jpeg', promptKey);
+        const result = await performOCR(apiKeys, optimized.split(',')[1], 'image/jpeg', promptKey);
         if (result.error) throw new Error(result.error);
         fullText += (i > 0 ? `\n\n--- Page ${i + 1} ---\n\n` : '') + result.text;
       }
 
       setProcessingPage(pagesToProcess.length + 1);
       // Stage 2: Summarization
-      const summary = await summarizeText(apiKey, fullText);
+      const summary = await summarizeText(apiKeys, fullText);
       
       const updatedDoc = {
         ...activeDoc,
         status: 'complete',
         text: fullText,
-        analysis: summary.error ? `### ⚠️ ANALYSIS PARTIALLY FAILED\n\nThe AI was unable to generate a summary due to a rate limit or API error: **${summary.error}**.\n\nHowever, the document text was extracted successfully. You can view it in the **EXTRACTED TEXT** tab.` : summary.text,
+        analysis: summary.error ? `### ⚠️ ANALYSIS PARTIALLY FAILED
+
+**Reason:** ${summary.error}
+
+**How to resolve:**
+1. **Global Cap:** If you see "free-models-per-day", your OpenRouter account hit its daily free limit.
+2. **Add Credits:** Adding $5 to your OpenRouter account usually unlocks 1000+ free requests/day.
+3. **Multi-Account:** Add keys from *different* accounts to your \`.env\` file.
+
+The document text was still extracted successfully—you can view it in the **EXTRACTED TEXT** tab.` : summary.text,
         model: summary.model || 'N/A'
       };
 
@@ -154,7 +166,7 @@ export default function App() {
       setIsProcessing(false);
       setProcessingPage(null);
     }
-  }, [activeDoc, apiKey, promptKey, history, addToast]);
+  }, [activeDoc, apiKeys, promptKey, history, addToast]);
 
   const handleRetryAnalysis = useCallback(async () => {
     if (!activeDoc || !activeDoc.text) return;
@@ -162,10 +174,19 @@ export default function App() {
     setProcessingPage(activeDoc.info.pages?.length + 1 || 2);
     
     try {
-      const summary = await summarizeText(apiKey, activeDoc.text);
+      const summary = await summarizeText(apiKeys, activeDoc.text);
       const updatedDoc = {
         ...activeDoc,
-        analysis: summary.error ? `### ⚠️ ANALYSIS PARTIALLY FAILED\n\nThe AI was unable to generate a summary due to a rate limit or API error: **${summary.error}**.\n\nHowever, the document text was extracted successfully. You can view it in the **EXTRACTED TEXT** tab.` : summary.text,
+        analysis: summary.error ? `### ⚠️ ANALYSIS PARTIALLY FAILED
+
+**Reason:** ${summary.error}
+
+**How to resolve:**
+1. **Global Cap:** If you see "free-models-per-day", your OpenRouter account hit its daily free limit.
+2. **Add Credits:** Adding $5 to your OpenRouter account usually unlocks 1000+ free requests/day.
+3. **Multi-Account:** Add keys from *different* accounts to your \`.env\` file.
+
+The document text was still extracted successfully—you can view it in the **EXTRACTED TEXT** tab.` : summary.text,
         model: summary.model || 'N/A'
       };
       
@@ -182,7 +203,7 @@ export default function App() {
       setIsProcessing(false);
       setProcessingPage(null);
     }
-  }, [activeDoc, apiKey, addToast]);
+  }, [activeDoc, apiKeys, addToast]);
 
   const handleDeleteDoc = useCallback((id) => {
     const newHistory = history.filter(d => d.id !== id);
@@ -238,8 +259,7 @@ export default function App() {
           <div style={{ fontSize: '14px', fontWeight: '700' }}>{activeDoc?.name || 'No document selected'}</div>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
              <select 
-              className="panel-tab" 
-              style={{ border: 'none', background: 'transparent', padding: '0 12px', height: 'auto' }}
+              className="select-premium" 
               value={promptKey}
               onChange={(e) => setPromptKey(e.target.value)}
             >
@@ -301,13 +321,13 @@ export default function App() {
                 <div className="panel-content">
                   {activeDoc.status === 'pending' ? (
                     <div className="empty-state" style={{ height: '100%' }}>
-                      <h2 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '12px' }}>Ready to Analyze</h2>
-                      <p style={{ color: 'var(--text-secondary)', marginBottom: '32px', maxWidth: '300px', textAlign: 'center' }}>Click the button below to begin AI text extraction and legal analysis.</p>
-                      
-                      <button className="btn-primary-sidebar" style={{ maxWidth: '240px' }} onClick={handleScan}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
-                        Start AI Scan
-                      </button>
+                      <div className="doc-icon" style={{ width: '64px', height: '64px', marginBottom: '24px', background: 'rgba(251, 191, 36, 0.05)', color: 'var(--accent-primary)' }}>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                      </div>
+                      <h2 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '12px' }}>Document Ready</h2>
+                      <p style={{ color: 'var(--text-secondary)', maxWidth: '320px', textAlign: 'center', lineHeight: '1.6' }}>
+                        Click <strong>Scan Document</strong> in the viewer panel to begin the AI extraction and legal analysis.
+                      </p>
                     </div>
                   ) : activeDoc.status === 'processing' ? (
                     <div className="empty-state" style={{ height: '100%', flex: 1 }}>

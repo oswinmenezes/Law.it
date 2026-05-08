@@ -25,7 +25,7 @@ export default function Header({ onSettingsClick, hasApiKey }) {
                 height: 8,
                 borderRadius: '50%',
                 background: '#ef4444',
-                border: '2px solid white'
+                border: '2px solid var(--bg-sidebar)'
               }}
             />
           )}

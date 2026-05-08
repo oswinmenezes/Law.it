@@ -60,7 +60,8 @@ export function getModelInfo() {
   };
 }
 
-export async function performOCR(apiKey, imageBase64, mimeType, promptKey = 'default') {
+export async function performOCR(apiKeys, imageBase64, mimeType, promptKey = 'default') {
+  const keys = Array.isArray(apiKeys) ? apiKeys : [apiKeys];
   const prompt = PROMPTS[promptKey] || PROMPTS.default;
   const imageUrl = `data:${mimeType};base64,${imageBase64}`;
 
@@ -69,26 +70,43 @@ export async function performOCR(apiKey, imageBase64, mimeType, promptKey = 'def
 
   for (const model of models) {
     console.log(`Attempting OCR with model: ${model}`);
-    const result = await callModel(apiKey, model, imageUrl, prompt);
+    
+    // Try each API key for the current model
+    for (let k = 0; k < keys.length; k++) {
+      const currentKey = keys[k];
+      if (keys.length > 1) console.log(`Using API key ${k + 1}/${keys.length}`);
+      
+      const result = await callModel(currentKey, model, imageUrl, prompt);
 
-    if (!result.error) {
-      return {
-        ...result,
-        fallback: model !== PRIMARY_MODEL,
-      };
-    }
+      if (!result.error) {
+        return {
+          ...result,
+          fallback: model !== PRIMARY_MODEL,
+        };
+      }
 
-    lastError = result;
-    console.warn(`Model ${model} failed:`, result.error);
+      lastError = result;
+      console.warn(`Model ${model} with Key ${k + 1} failed:`, result.error);
 
-    // If it's a 401 (Unauthorized), don't bother with fallbacks
-    if (result.status === 401) {
-      return result;
+      // If it's a 401 (Unauthorized), don't bother with this key anymore, but maybe try next key
+      if (result.status === 401) {
+        continue; 
+      }
+
+      // If it's NOT a rate limit (429), then the model itself might be down or image too large
+      // In that case, we should try the next model instead of rotating keys for this failing model
+      if (result.status !== 429 && !result.error.includes('rate limit')) {
+        break; 
+      }
+      
+      if (k < keys.length - 1) {
+        console.log('Rate limit reached or 429 error. Rotating to next API key...');
+      }
     }
 
     // If we've hit the GLOBAL free tier limit, don't try other free models
-    if (result.error && result.error.includes('free-models-per-day')) {
-      console.log('Global free-tier limit reached. Switching to Local OCR Fallback...');
+    if (lastError?.error && lastError.error.includes('free-models-per-day')) {
+      console.log('Global free-tier limit reached across all keys. Switching to Local OCR Fallback...');
       break; 
     }
   }
@@ -170,7 +188,8 @@ async function callModel(apiKey, model, imageUrl, prompt) {
     };
   }
 }
-export async function summarizeText(apiKey, text) {
+export async function summarizeText(apiKeys, text) {
+  const keys = Array.isArray(apiKeys) ? apiKeys : [apiKeys];
   const models = [
     'google/gemini-2.0-flash:free',
     'google/gemini-2.0-flash-lite-preview-02-05:free',
@@ -216,49 +235,73 @@ ${text}
   let lastError = null;
 
   for (const model of models) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000);
+    for (let k = 0; k < keys.length; k++) {
+      const currentKey = keys[k];
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
 
-    try {
-      console.log(`Attempting summary with model: ${model}`);
-      const response = await fetch(OPENROUTER_API_URL, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': window.location.origin,
-          'X-Title': 'OCR Scanner Summary',
-        },
-        signal: controller.signal,
-        body: JSON.stringify({
-          model: model,
-          messages: [{ role: 'user', content: prompt }],
-          max_tokens: 1024,
-          temperature: 0.3,
-        }),
-      });
+      try {
+        console.log(`Attempting summary with model: ${model} (Key ${k + 1})`);
+        const response = await fetch(OPENROUTER_API_URL, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${currentKey}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': window.location.origin,
+            'X-Title': 'OCR Scanner Summary',
+          },
+          signal: controller.signal,
+          body: JSON.stringify({
+            model: model,
+            messages: [{ role: 'user', content: prompt }],
+            max_tokens: 1024,
+            temperature: 0.3,
+          }),
+        });
 
-      clearTimeout(timeoutId);
+        clearTimeout(timeoutId);
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        lastError = { error: errorData.error?.message || `API error (${response.status})`, status: response.status };
-        console.warn(`Summary model ${model} failed:`, lastError.error);
-        
-        if (response.status === 401) return lastError;
-        continue;
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            const errorMsg = errorData.error?.message || `API error (${response.status})`;
+            lastError = { error: errorMsg, status: response.status };
+            console.warn(`Summary model ${model} with key ${k + 1} failed:`, errorMsg);
+            
+            if (response.status === 401) continue;
+
+            // Specific check for global free-tier limit
+            if (errorMsg.toLowerCase().includes('free-models-per-day')) {
+              console.error('GLOBAL OpenRouter free-tier limit reached for this account.');
+              // If we have more keys, try them, as they might be from different accounts
+              if (k < keys.length - 1) {
+                console.log('Rotating to next API key (hopefully a different account)...');
+                continue;
+              }
+              // If no more keys, this account is done for the day for free models
+              break; 
+            }
+
+            if (response.status === 429 || errorMsg.toLowerCase().includes('rate limit')) {
+              if (k < keys.length - 1) {
+                console.log('Rotating API key for summary due to rate limit...');
+                continue;
+              }
+            }
+            break; 
+          }
+
+        const data = await response.json();
+        return { 
+          text: data.choices?.[0]?.message?.content || '[No summary generated]',
+          model: model 
+        };
+      } catch (err) {
+        clearTimeout(timeoutId);
+        const msg = err.name === 'AbortError' ? 'Summary request timed out' : err.message;
+        lastError = { error: `Network error: ${msg}`, model: model };
+        console.warn(`Summary model ${model} error:`, msg);
+        break; // Move to next model on network error
       }
-
-      const data = await response.json();
-      return { 
-        text: data.choices?.[0]?.message?.content || '[No summary generated]',
-        model: model 
-      };
-    } catch (err) {
-      clearTimeout(timeoutId);
-      const msg = err.name === 'AbortError' ? 'Summary request timed out' : err.message;
-      lastError = { error: `Network error: ${msg}`, model: model };
-      console.warn(`Summary model ${model} error:`, msg);
     }
   }
 
