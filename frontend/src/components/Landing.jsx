@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
-import { Scale, Mic, Zap, Shield, ChevronRight } from 'lucide-react';
+import { Scale, Mic, Zap, Shield, ChevronRight, User } from 'lucide-react';
 import useCourtStore from '../store/useCourtStore';
 import ParticleBackground from './ParticleBackground';
 import ApiKeyModal from './ApiKeyModal';
 import { useState } from 'react';
+import Cookies from 'js-cookie';
 
 const features = [
   {
@@ -44,13 +45,28 @@ const itemVariants = {
 export default function Landing() {
   const { setPage, apiKey } = useCourtStore();
   const [showApiModal, setShowApiModal] = useState(false);
+  const [legalName, setLegalName] = useState(Cookies.get('legal_name') || '');
 
   const handleStart = () => {
+    if (!legalName) {
+      alert('Please enter your Legal Identity to proceed.');
+      return;
+    }
+    Cookies.set('legal_name', legalName, { expires: 7 });
     if (!apiKey) {
       setShowApiModal(true);
       return;
     }
     setPage('setup');
+  };
+
+  const handleJoinCustom = () => {
+    if (!legalName) {
+      alert('Please enter your Legal Identity to proceed.');
+      return;
+    }
+    Cookies.set('legal_name', legalName, { expires: 7 });
+    setPage('custom');
   };
 
   return (
@@ -89,12 +105,25 @@ export default function Landing() {
         <motion.p variants={itemVariants} className="landing-subtitle">
           AI-powered litigation simulator for Indian courts.
         </motion.p>
-        <motion.p variants={itemVariants} className="landing-tagline-sub">
-          Practice oral arguments. Face judicial pressure. Build courtroom instinct.
-        </motion.p>
+        
+        {/* Name Input */}
+        <motion.div variants={itemVariants} className="w-full max-w-sm mb-8">
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <User size={18} className="text-white/20 group-focus-within:text-gold-400 transition-colors" />
+            </div>
+            <input
+              type="text"
+              placeholder="Enter Your Legal Identity"
+              value={legalName}
+              onChange={(e) => setLegalName(e.target.value)}
+              className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-8 pl-16 pr-8 text-xl text-white placeholder:text-white/20 focus:outline-none focus:border-gold-400/50 focus:bg-white/[0.05] transition-all"
+            />
+          </div>
+        </motion.div>
 
         {/* CTA */}
-        <motion.div variants={itemVariants}>
+        <motion.div variants={itemVariants} className="flex flex-col md:flex-row gap-4">
           <button
             id="btn-enter-courtroom"
             className="btn-gold"
@@ -103,7 +132,16 @@ export default function Landing() {
             Enter the Courtroom
             <ChevronRight size={18} strokeWidth={2.5} />
           </button>
+          <button
+            id="btn-join-custom"
+            className="px-8 py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition-all flex items-center gap-2 group cursor-pointer"
+            onClick={handleJoinCustom}
+          >
+            Join Custom Room
+            <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+          </button>
         </motion.div>
+
 
         {/* Feature cards */}
         <motion.div variants={itemVariants} className="landing-features">

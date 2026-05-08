@@ -46,6 +46,13 @@ const useCourtStore = create((set, get) => ({
   // Scoring
   scores: null,
 
+  // Multiplayer
+  roomData: null,
+  currentUser: null, // { id, name, role }
+  opponent: null, // { id, name, role }
+  multiplayerMode: false,
+  isReady: false,
+
   // Actions
   setApiKey: (key) => {
     localStorage.setItem('gemini_api_key', key);
@@ -159,6 +166,12 @@ const useCourtStore = create((set, get) => ({
   setAiAudioLevel: (level) => set({ aiAudioLevel: level }),
 
   setScores: (scores) => set({ scores, currentPage: 'scorecard' }),
+
+  setRoomData: (data) => set({ roomData: data }),
+  setCurrentUser: (user) => set({ currentUser: user }),
+  setOpponent: (user) => set({ opponent: user }),
+  setMultiplayerMode: (enabled) => set({ multiplayerMode: enabled }),
+  setReady: (ready) => set({ isReady: ready }),
 
   resetSession: () => {
     const { timerId } = get();
