@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion';
-import { Scale, Mic, Zap, Shield, ChevronRight, Trophy } from 'lucide-react';
+import { Scale, Mic, Zap, Shield, ChevronRight, Trophy, User } from 'lucide-react';
 import useCourtStore from '../store/useCourtStore';
 import ParticleBackground from './ParticleBackground';
 import ApiKeyModal from './ApiKeyModal';
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
+import Cookies from 'js-cookie';
 
 const features = [
   {
@@ -46,10 +47,11 @@ export default function Landing() {
   const { setPage, apiKey, playerName, setPlayerName, setPlayerId } = useCourtStore();
   const [showApiModal, setShowApiModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [legalName, setLegalName] = useState(Cookies.get('legal_name') || '');
 
   const handleStart = async () => {
-    if (!playerName.trim()) {
-      alert("Please enter your name, Counsel.");
+    if (!legalName.trim()) {
+      alert("Please enter your Legal Identity to proceed.");
       return;
     }
     if (!apiKey) {
@@ -61,13 +63,15 @@ export default function Landing() {
     try {
       const { data, error } = await supabase
         .from('players')
-        .insert([{ username: playerName.trim() }])
+        .insert([{ username: legalName.trim() }])
         .select()
         .single();
         
       if (error) throw error;
       
+      setPlayerName(legalName.trim());
       setPlayerId(data.id);
+      Cookies.set('legal_name', legalName.trim(), { expires: 7 });
       setPage('setup');
     } catch (err) {
       console.error("Error creating player:", err);
@@ -76,6 +80,36 @@ export default function Landing() {
       setIsLoading(false);
     }
   };
+
+  const handleJoinCustom = async () => {
+    if (!legalName.trim()) {
+      alert("Please enter your Legal Identity to proceed.");
+      return;
+    }
+    
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('players')
+        .insert([{ username: legalName.trim() }])
+        .select()
+        .single();
+        
+      if (error) throw error;
+      
+      setPlayerName(legalName.trim());
+      setPlayerId(data.id);
+      Cookies.set('legal_name', legalName.trim(), { expires: 7 });
+      setPage('custom');
+    } catch (err) {
+      console.error("Error creating player:", err);
+      alert("Failed to connect to the courtroom server.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
 
   return (
     <motion.div
@@ -113,30 +147,25 @@ export default function Landing() {
         <motion.p variants={itemVariants} className="landing-subtitle">
           AI-powered litigation simulator for Indian courts.
         </motion.p>
-        <motion.p variants={itemVariants} className="landing-tagline-sub">
-          Practice oral arguments. Face judicial pressure. Build courtroom instinct.
-        </motion.p>
+        
+        {/* Name Input */}
+        <motion.div variants={itemVariants} className="w-full max-w-sm mb-8">
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <User size={18} className="text-white/20 group-focus-within:text-gold-400 transition-colors" />
+            </div>
+            <input
+              type="text"
+              placeholder="Enter Your Legal Identity"
+              value={legalName}
+              onChange={(e) => setLegalName(e.target.value)}
+              className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-8 pl-16 pr-8 text-xl text-white placeholder:text-white/20 focus:outline-none focus:border-gold-400/50 focus:bg-white/[0.05] transition-all"
+            />
+          </div>
+        </motion.div>
 
         {/* CTA */}
-        <motion.div variants={itemVariants} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', marginTop: '1.5rem', marginBottom: '2rem' }}>
-          <input 
-            type="text" 
-            placeholder="Enter your name, Counsel..." 
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
-            style={{
-              padding: '0.875rem 1.25rem',
-              borderRadius: '0.75rem',
-              border: '1px solid var(--gold-500)',
-              background: 'rgba(20, 20, 25, 0.8)',
-              color: 'var(--c-text-primary)',
-              width: '100%',
-              maxWidth: '300px',
-              fontSize: '1rem',
-              outline: 'none',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-            }}
-          />
+        <motion.div variants={itemVariants} className="flex flex-col md:flex-row gap-4 items-center justify-center mt-6 mb-8 w-full max-w-lg">
           <button
             id="btn-enter-courtroom"
             className="btn-gold"
@@ -167,7 +196,16 @@ export default function Landing() {
           >
             <Trophy size={16} /> View Hall of Fame
           </button>
+          <button
+            id="btn-join-custom"
+            className="px-8 py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition-all flex items-center gap-2 group cursor-pointer"
+            onClick={handleJoinCustom}
+          >
+            Join Custom Room
+            <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+          </button>
         </motion.div>
+
 
         {/* Feature cards */}
         <motion.div variants={itemVariants} className="landing-features">

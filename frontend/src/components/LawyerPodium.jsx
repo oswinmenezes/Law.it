@@ -4,10 +4,8 @@ import useCourtStore from '../store/useCourtStore';
 import WaveformVisualizer from './WaveformVisualizer';
 
 export default function LawyerPodium() {
-  const activeSpeaker = useCourtStore((s) => s.activeSpeaker);
-  const isMicOn = useCourtStore((s) => s.isMicOn);
-  const userAudioLevel = useCourtStore((s) => s.userAudioLevel);
-  const isActive = activeSpeaker === 'lawyer';
+  const { activeSpeaker, isMicOn, userAudioLevel, currentUser } = useCourtStore();
+  const isActive = activeSpeaker === currentUser?.role;
 
   return (
     <motion.div
@@ -36,14 +34,12 @@ export default function LawyerPodium() {
       </div>
 
       {/* Label */}
-      <div className="text-center">
         <h3 className={`text-sm font-bold uppercase tracking-wider transition-colors ${
           isActive ? 'text-emerald-400' : 'text-white/30'
         }`}>
-          You
+          {currentUser?.name || 'You'}
         </h3>
-        <p className="text-[10px] text-white/20 mt-0.5">Counsel for Petitioner</p>
-      </div>
+        <p className="text-[10px] text-white/20 mt-0.5 uppercase tracking-widest">{currentUser?.role}</p>
 
       {/* Waveform */}
       <div className="w-full h-8">

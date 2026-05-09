@@ -4,8 +4,8 @@ const INITIAL_SESSION_DURATION = 300; // 5 minutes in seconds
 
 const useCourtStore = create((set, get) => ({
   // App state
-  currentPage: 'landing', // landing | setup | courtroom | scorecard | leaderboard
-  apiKey: localStorage.getItem('gemini_api_key') || '',
+  currentPage: 'landing', // landing | setup | courtroom | scorecard | leaderboard | custom | pretrial
+  apiKey: import.meta.env.VITE_GEMINI_API_KEY || localStorage.getItem('gemini_api_key') || '',
   playerName: '',
   playerId: null,
 
@@ -47,6 +47,13 @@ const useCourtStore = create((set, get) => ({
 
   // Scoring
   scores: null,
+
+  // Multiplayer
+  roomData: null,
+  currentUser: null, // { id, name, role }
+  opponent: null, // { id, name, role }
+  multiplayerMode: false,
+  isReady: false,
 
   // Actions
   setApiKey: (key) => {
@@ -139,12 +146,13 @@ const useCourtStore = create((set, get) => ({
     }],
   })),
 
-  updateLastTranscript: (text) => set((s) => {
+  updateLastTranscript: (text, isDone = false) => set((s) => {
     const transcript = [...s.transcript];
     // Find the last streaming entry to update
     for (let i = transcript.length - 1; i >= 0; i--) {
       if (transcript[i].streaming) {
         transcript[i] = { ...transcript[i], text };
+        if (isDone) delete transcript[i].streaming;
         break;
       }
     }
@@ -164,6 +172,12 @@ const useCourtStore = create((set, get) => ({
   setAiAudioLevel: (level) => set({ aiAudioLevel: level }),
 
   setScores: (scores) => set({ scores, currentPage: 'scorecard' }),
+
+  setRoomData: (data) => set({ roomData: data }),
+  setCurrentUser: (user) => set({ currentUser: user }),
+  setOpponent: (user) => set({ opponent: user }),
+  setMultiplayerMode: (enabled) => set({ multiplayerMode: enabled }),
+  setReady: (ready) => set({ isReady: ready }),
 
   resetSession: () => {
     const { timerId } = get();
