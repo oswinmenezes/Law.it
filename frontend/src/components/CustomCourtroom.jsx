@@ -254,6 +254,104 @@ export default function CustomCourtroom() {
     };
   }, [roomData, currentUser]);
 
+  // ─── Auto-Judge Logic ─────────────────────────────────────────────────────
+  const transcriptLengthRef = useRef(0);
+  const transcriptList = useCourtStore((s) => s.transcript);
+
+  useEffect(() => {
+    // Only prosecutor runs the auto-judge to prevent double-calls and infinite loops
+    if (!roomData || currentUser?.role !== 'prosecutor' || !apiKey) return;
+    if (transcriptList.length <= transcriptLengthRef.current) return;
+    
+    transcriptLengthRef.current = transcriptList.length;
+
+    const lastEntry = transcriptList[transcriptList.length - 1];
+    if (!lastEntry || lastEntry.speaker === 'judge' || lastEntry.speaker === 'system') return;
+
+    const checkJudgeIntervention = async () => {
+      if (isJudgeProcessingRef.current) return;
+      
+      // Short delay to allow natural flow
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const currentLen = useCourtStore.getState().transcript.length;
+
+      isJudgeProcessingRef.current = true;
+      try {
+        const fullTranscript = useCourtStore.getState().transcript
+          .map((t) => `${t.name} (${t.speaker}): ${t.text}`)
+          .join('\n');
+
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              systemInstruction: {
+                parts: [{ text: `You are the Honorable Judge in the case: ${roomData.title}.
+Analyze the transcript. Decide if you MUST intervene right now.
+Intervene ONLY IF:
+1. A lawyer says "Objection". (YOU MUST ALWAYS INTERVENE AND RULE ON THE OBJECTION IMMEDIATELY).
+2. A lawyer asks the court a direct question or needs a ruling (e.g. "my lord can you please", "my lord").
+3. The lawyers are arguing back and forth too much, breaking courtroom decorum, or going off-topic.
+If you do not need to intervene, set should_intervene to false.
+If you intervene, provide your exact spoken statement (max 2 sentences).
+` }]
+              },
+              contents: [{ parts: [{ text: `TRANSCRIPT:\n${fullTranscript}\n\nDecision:` }] }],
+              generationConfig: { 
+                temperature: 0.2, 
+                responseMimeType: 'application/json',
+                responseSchema: {
+                  type: 'object',
+                  properties: {
+                    should_intervene: { type: 'boolean' },
+                    judge_statement: { type: 'string', description: 'What the judge will say. Leave empty if should_intervene is false.' }
+                  },
+                  required: ['should_intervene', 'judge_statement']
+                }
+              }
+            })
+          }
+        );
+
+        if (!res.ok) throw new Error(`API returned ${res.status}: ${await res.text()}`);
+        const data = await res.json();
+        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (responseText) {
+          const cleanText = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          const decision = JSON.parse(cleanText);
+          if (decision.should_intervene && decision.judge_statement) {
+            useCourtStore.getState().addTranscript({
+              speaker: 'judge',
+              text: decision.judge_statement,
+              name: 'The Honorable Judge',
+              type: 'judge'
+            });
+            speak(decision.judge_statement, 'judge');
+            await supabase.from('court_case').insert([
+              {
+                room_id: roomData.room_id,
+                user_id: '00000000-0000-0000-0000-000000000000',
+                name: 'The Honorable Judge',
+                role: 'judge',
+                statement: decision.judge_statement,
+                type: 'judge'
+              }
+            ]);
+          }
+        }
+      } catch (err) {
+        console.error('Auto-Judge Error:', err);
+      } finally {
+        isJudgeProcessingRef.current = false;
+      }
+    };
+
+    checkJudgeIntervention();
+  }, [transcriptList.length, roomData, currentUser, apiKey]);
+
   const triggerJudgeAI = async () => {
     if (!apiKey || currentUser?.role !== 'prosecutor' || isJudgeProcessingRef.current) return;
 
@@ -280,7 +378,7 @@ export default function CustomCourtroom() {
       });
 
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:streamGenerateContent?alt=sse&key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse&key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -293,6 +391,10 @@ export default function CustomCourtroom() {
           })
         }
       );
+
+      if (!res.ok) {
+        throw new Error(`API returned ${res.status}: ${await res.text()}`);
+      }
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder('utf-8');
@@ -366,7 +468,7 @@ export default function CustomCourtroom() {
         .join('\n');
 
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

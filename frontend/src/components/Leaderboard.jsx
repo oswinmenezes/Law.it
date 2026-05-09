@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Star, Award, Shield, AlertTriangle, ArrowLeft, Crown } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { supabase1 } from '../lib/supabase';
 import useCourtStore from '../store/useCourtStore';
 import ParticleBackground from './ParticleBackground';
 
@@ -13,7 +13,7 @@ export default function Leaderboard() {
   useEffect(() => {
     async function fetchLeaderboard() {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await supabase1
           .from('leaderboard_scores')
           .select(`
             total_score,
@@ -29,7 +29,9 @@ export default function Leaderboard() {
         if (error) throw error;
         setLeaders(data || []);
       } catch (err) {
-        console.error('Error fetching leaderboard:', err);
+        if (err.code !== 'PGRST205') {
+            console.error('Error fetching leaderboard:', err);
+        }
       } finally {
         setLoading(false);
       }

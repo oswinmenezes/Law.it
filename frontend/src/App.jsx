@@ -16,12 +16,12 @@ export default function App() {
   return (
     <div style={{ height: '100%', width: '100%', overflow: 'auto', background: 'var(--c-black)' }}>
       <AnimatePresence mode="wait">
-        {currentPage === 'landing'   && <Landing      key="landing"   />}
-        {currentPage === 'custom'    && <CustomRoom   key="custom"    />}
-        {currentPage === 'pretrial'  && <PreTrial     key="pretrial"  />}
-        {currentPage === 'setup'     && <CaseSetup    key="setup"     />}
+        {currentPage === 'landing' && <Landing key="landing" />}
+        {currentPage === 'custom' && <CustomRoom key="custom" />}
+        {currentPage === 'pretrial' && <PreTrial key="pretrial" />}
+        {currentPage === 'setup' && <CaseSetup key="setup" />}
         {currentPage === 'courtroom' && (multiplayerMode ? <CustomCourtroom key="customCourtroom" /> : <Courtroom key="courtroom" />)}
-        {currentPage === 'scorecard' && <ScoreCard    key="scorecard" />}
+        {currentPage === 'scorecard' && <ScoreCard key="scorecard" />}
         {currentPage === 'leaderboard' && <Leaderboard key="leaderboard" />}
       </AnimatePresence>
     </div>

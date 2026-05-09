@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Trophy, ArrowLeft, RotateCcw, TrendingUp, TrendingDown, Lightbulb, Scale } from 'lucide-react';
 import useCourtStore from '../store/useCourtStore';
 import { useEffect, useRef } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase1 } from '../lib/supabase';
 
 const criteriaLabels = {
   legal_reasoning: 'Legal Reasoning',
@@ -71,12 +71,15 @@ export default function ScoreCard() {
           objection_handling_score: scores.criteria?.pressure_management?.score || 0,
         };
         
-        const { error } = await supabase.from('leaderboard_scores').insert([payload]);
-        if (error) throw error;
+        // Supabase might throw if leaderboard_scores doesn't exist
+        const { error } = await supabase1.from('leaderboard_scores').insert([payload]);
+        if (error && error.code !== 'PGRST205') {
+            console.error("Error saving score:", error);
+        }
         
         savedScoreRef.current = true;
       } catch (err) {
-        console.error("Error saving score to leaderboard:", err);
+        // Ignore errors if leaderboard table is missing to prevent crashing
       }
     }
     saveScore();

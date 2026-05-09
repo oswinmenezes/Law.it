@@ -4,8 +4,10 @@ import useCourtStore from '../store/useCourtStore';
 import WaveformVisualizer from './WaveformVisualizer';
 
 export default function OpposingCounsel() {
-  const { activeSpeaker, aiAudioLevel, opponent } = useCourtStore();
-  const isActive = activeSpeaker === opponent?.role;
+  const { activeSpeaker, aiAudioLevel, opponent, multiplayerMode } = useCourtStore();
+  const isActive = multiplayerMode 
+    ? activeSpeaker === opponent?.role 
+    : activeSpeaker === 'opposing';
 
   return (
     <motion.div
@@ -36,9 +38,11 @@ export default function OpposingCounsel() {
         <h3 className={`text-sm font-bold uppercase tracking-wider transition-colors ${
           isActive ? 'text-blue-400' : 'text-white/30'
         }`}>
-          {opponent?.name || 'Opp. Counsel'}
+          {multiplayerMode ? (opponent?.name || 'Opp. Counsel') : 'Opp. Counsel'}
         </h3>
-        <p className="text-[10px] text-white/20 mt-0.5 uppercase tracking-widest">{opponent?.role || 'Learned Counsel'}</p>
+        <p className="text-[10px] text-white/20 mt-0.5 uppercase tracking-widest">
+          {multiplayerMode ? (opponent?.role || 'Learned Counsel') : 'Learned Counsel for Respondent'}
+        </p>
       </div>
 
       {/* Waveform */}

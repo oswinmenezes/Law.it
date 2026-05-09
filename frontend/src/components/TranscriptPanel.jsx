@@ -5,6 +5,7 @@ import useCourtStore from '../store/useCourtStore';
 
 const speakerConfig = {
   judge: { label: 'HON\'BLE JUDGE', color: 'text-red-400', dot: 'bg-red-400', border: 'border-red-400/20' },
+  opposing: { label: 'OPP. COUNSEL', color: 'text-blue-400', dot: 'bg-blue-400', border: 'border-blue-400/20' },
   prosecutor: { label: 'PROSECUTOR', color: 'text-emerald-400', dot: 'bg-emerald-400', border: 'border-emerald-400/20' },
   defendant: { label: 'DEFENSE', color: 'text-blue-400', dot: 'bg-blue-400', border: 'border-blue-400/20' },
   lawyer: { label: 'YOU', color: 'text-emerald-400', dot: 'bg-emerald-400', border: 'border-emerald-400/20' },

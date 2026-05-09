@@ -4,7 +4,7 @@ import useCourtStore from '../store/useCourtStore';
 import ParticleBackground from './ParticleBackground';
 import ApiKeyModal from './ApiKeyModal';
 import { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase1 } from '../lib/supabase';
 import Cookies from 'js-cookie';
 
 const features = [
@@ -61,16 +61,26 @@ export default function Landing() {
     
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      let newPlayerId = crypto.randomUUID();
+      
+      // Try to save to Supabase for Leaderboard purposes
+      const { data, error } = await supabase1
         .from('players')
         .insert([{ username: legalName.trim() }])
         .select()
         .single();
         
-      if (error) throw error;
+      if (error) {
+        if (error.code !== 'PGRST205') {
+           console.warn("Failed to create player record:", error);
+        }
+        // If table doesn't exist, we just proceed with the local UUID
+      } else if (data) {
+        newPlayerId = data.id;
+      }
       
       setPlayerName(legalName.trim());
-      setPlayerId(data.id);
+      setPlayerId(newPlayerId);
       Cookies.set('legal_name', legalName.trim(), { expires: 7 });
       setPage('setup');
     } catch (err) {
@@ -89,16 +99,26 @@ export default function Landing() {
     
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      let newPlayerId = crypto.randomUUID();
+      
+      // Try to save to Supabase for Leaderboard purposes
+      const { data, error } = await supabase1
         .from('players')
         .insert([{ username: legalName.trim() }])
         .select()
         .single();
         
-      if (error) throw error;
+      if (error) {
+        if (error.code !== 'PGRST205') {
+           console.warn("Failed to create player record:", error);
+        }
+        // If table doesn't exist, we just proceed with the local UUID
+      } else if (data) {
+        newPlayerId = data.id;
+      }
       
       setPlayerName(legalName.trim());
-      setPlayerId(data.id);
+      setPlayerId(newPlayerId);
       Cookies.set('legal_name', legalName.trim(), { expires: 7 });
       setPage('custom');
     } catch (err) {
