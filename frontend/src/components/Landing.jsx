@@ -53,10 +53,6 @@ export default function Landing() {
       return;
     }
     Cookies.set('legal_name', legalName, { expires: 7 });
-    if (!apiKey) {
-      setShowApiModal(true);
-      return;
-    }
     setPage('setup');
   };
 

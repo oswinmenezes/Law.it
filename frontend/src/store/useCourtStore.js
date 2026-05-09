@@ -5,7 +5,7 @@ const INITIAL_SESSION_DURATION = 300; // 5 minutes in seconds
 const useCourtStore = create((set, get) => ({
   // App state
   currentPage: 'landing', // landing | setup | courtroom | scorecard
-  apiKey: localStorage.getItem('gemini_api_key') || '',
+  apiKey: import.meta.env.VITE_GEMINI_API_KEY || '',
 
   // Case data
   caseData: null,
@@ -141,12 +141,13 @@ const useCourtStore = create((set, get) => ({
     }],
   })),
 
-  updateLastTranscript: (text) => set((s) => {
+  updateLastTranscript: (text, isDone = false) => set((s) => {
     const transcript = [...s.transcript];
     // Find the last streaming entry to update
     for (let i = transcript.length - 1; i >= 0; i--) {
       if (transcript[i].streaming) {
         transcript[i] = { ...transcript[i], text };
+        if (isDone) delete transcript[i].streaming;
         break;
       }
     }
