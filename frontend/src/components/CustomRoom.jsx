@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Hash, Lock, ChevronLeft, ArrowRight, Loader2, Users, Scale } from 'lucide-react';
+import { Hash, Lock, ChevronLeft, ArrowRight, Loader2, Users } from 'lucide-react';
 import useCourtStore from '../store/useCourtStore';
 import { supabase } from '../lib/supabase';
 import Cookies from 'js-cookie';
@@ -15,7 +15,7 @@ export default function CustomRoom() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const legalName = Cookies.get('legal_name');
+  const legalName = Cookies.get('legal_name') || 'Counsel';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -136,7 +136,7 @@ export default function CustomRoom() {
           <span className="text-xs font-bold uppercase tracking-widest">Back to Chambers</span>
         </button>
 
-        <div className="glass-panel custom-room-card border border-white/5 mx-auto relative overflow-hidden">
+        <div className="glass-panel custom-room-card border border-white/5 mx-auto relative overflow-hidden p-8 rounded-3xl bg-white/[0.02] backdrop-blur-xl">
           {/* Toggle Tabs */}
           <div className="flex p-1 bg-white/[0.03] border border-white/5 rounded-2xl mb-10">
             <button
@@ -161,10 +161,10 @@ export default function CustomRoom() {
             <div className="w-20 h-20 rounded-[1.5rem] bg-gold-400/10 flex items-center justify-center border border-gold-400/20 mb-8 shadow-lg shadow-gold-400/5">
               {mode === 'join' ? <Users className="w-10 h-10 text-gold-400" /> : <Hash className="w-10 h-10 text-gold-400" />}
             </div>
-            <h1 className="text-3xl font-black text-white mb-3 font-[family-name:var(--font-display)] tracking-tight">
+            <h1 className="text-3xl font-black text-white mb-3 tracking-tight">
               {mode === 'join' ? 'Join Private Hearing' : 'Establish Courtroom'}
             </h1>
-            <p className="text-sm md:text-base text-white/40 leading-relaxed max-w-[280px] md:max-w-none">
+            <p className="text-sm md:text-base text-white/40 leading-relaxed">
               {mode === 'join' 
                 ? 'Enter the credentials provided to access the designated courtroom.'
                 : 'Configure a unique room identity and case details for your session.'
@@ -185,34 +185,34 @@ export default function CustomRoom() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
-                <label className="custom-room-label">
+                <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] ml-1">
                   {mode === 'join' ? 'Room Identity' : 'Proposed Room ID'}
                 </label>
-                <div className="custom-room-input-wrapper">
-                  <Hash className="custom-room-input-icon" />
+                <div className="relative">
+                  <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
                   <input
                     type="text"
                     placeholder={mode === 'join' ? "e.g. CR-8829" : "e.g. ALPHA-ROOM"}
                     value={roomId}
                     onChange={(e) => setRoomId(e.target.value)}
-                    className="custom-room-input uppercase"
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/10 focus:border-gold-400/50 transition-colors uppercase outline-none"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-3">
-                <label className="custom-room-label">
+                <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] ml-1">
                   {mode === 'join' ? 'Access Credentials' : 'Set Access Key'}
                 </label>
-                <div className="custom-room-input-wrapper">
-                  <Lock className="custom-room-input-icon" />
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
                   <input
                     type="password"
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="custom-room-input"
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/10 focus:border-gold-400/50 transition-colors outline-none"
                     required
                   />
                 </div>
@@ -226,26 +226,24 @@ export default function CustomRoom() {
                 animate={{ opacity: 1, height: 'auto' }}
               >
                 <div className="space-y-3">
-                  <label className="custom-room-label">Matter Heading</label>
-                  <div className="custom-room-input-wrapper">
-                    <input
-                      type="text"
-                      placeholder="e.g. State of Maharashtra vs K. Nanavati"
-                      value={heading}
-                      onChange={(e) => setHeading(e.target.value)}
-                      className="custom-room-input pl-6"
-                      required={mode === 'create'}
-                    />
-                  </div>
+                  <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] ml-1">Matter Heading</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. State vs K. Nanavati"
+                    value={heading}
+                    onChange={(e) => setHeading(e.target.value)}
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-4 px-6 text-white placeholder:text-white/10 focus:border-gold-400/50 transition-colors outline-none"
+                    required={mode === 'create'}
+                  />
                 </div>
 
                 <div className="space-y-3">
-                  <label className="custom-room-label">Case Description</label>
+                  <label className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] ml-1">Case Description</label>
                   <textarea
                     placeholder="Provide a brief overview of the legal matter..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="custom-room-input min-h-[120px] py-4 pl-6 resize-none"
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-4 px-6 text-white placeholder:text-white/10 focus:border-gold-400/50 transition-colors min-h-[120px] resize-none outline-none"
                     required={mode === 'create'}
                   />
                 </div>
@@ -255,7 +253,7 @@ export default function CustomRoom() {
             <button
               type="submit"
               disabled={isLoading || !roomId || !password || (mode === 'create' && (!heading || !description))}
-              className="btn-gold custom-room-btn group disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-gold-400/10"
+              className="w-full bg-gold-400 hover:bg-gold-500 disabled:opacity-50 text-court-black font-black uppercase tracking-widest py-5 rounded-2xl flex items-center justify-center gap-3 transition-all cursor-pointer shadow-xl shadow-gold-400/10"
             >
               {isLoading ? (
                 <>
@@ -265,7 +263,7 @@ export default function CustomRoom() {
               ) : (
                 <>
                   <span>{mode === 'join' ? 'Join Session' : 'Create & Enter'}</span>
-                  <ArrowRight className="w-6 h-6 group-hover:translate-x-1.5 transition-transform" />
+                  <ArrowRight className="w-6 h-6" />
                 </>
               )}
             </button>
